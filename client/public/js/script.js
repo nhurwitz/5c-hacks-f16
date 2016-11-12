@@ -233,9 +233,11 @@ $('input[type=file]').change(function() {
         processData: false,
         contentType: false,
         success: function ( data ) {
+            $("#field").removeAttr("disabled");
             zipValues = {};
+            resetZipCodeLayer();
             datasetId = data["dataset_id"];
-            representativeness = data["metadata"]["representativeness"];
+            $("#rep-ind").text($data["metadata"]["representativeness"]);
             var $field = $("#field");
             $field.empty(); 
             $.each(data["metadata"]["columns"], function(col) {
@@ -248,5 +250,6 @@ $('input[type=file]').change(function() {
 
 $("#field").change(function() {
     currentField = $('#field').val();
+    zipValues = {};
     resetZipCodeLayer();
 });
