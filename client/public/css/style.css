@@ -21,9 +21,11 @@
 }
 
 .sidebar-nav {
+  padding-left: 5px;
   top: 0;
   margin: 0;
-  padding: 10px;
+  padding-top: 10px;
+  padding-left: 30px;
   list-style: none;
 }
 
@@ -41,6 +43,12 @@
 
 .dropdown {
   display:inline;
+}
+
+.row {
+  border-top: 2px solid #eeeeee;
+  padding-top: 25px;
+  padding-bottom: 25px;
 }
 
 #map {

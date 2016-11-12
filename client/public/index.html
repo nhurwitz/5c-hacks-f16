@@ -21,19 +21,28 @@
         <h1>Magnifeye</h1>
       </div>
       <div class="sidebar-nav">
-        <span class="label">Active field:</span>
-        <div class="dropdown">
-          <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-            Population Density
-            <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu">
-            <li><a href="#">Action</a></li>
-            <li><a href="#">Another action</a></li>
-            <li><a href="#">Something else here</a></li>
-            <li role="separator" class="divider"></li>
-            <li><a href="#">Separated link</a></li>
-          </ul>
+        <div class="row">
+          <span class="label">Active field:</span>
+          <div class="dropdown">
+            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+              Population Density
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a href="#">Action</a></li>
+              <li><a href="#">Another action</a></li>
+              <li><a href="#">Something else here</a></li>
+              <li role="separator" class="divider"></li>
+              <li><a href="#">Separated link</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="row">
+          <label class="btn btn-default btn-file">
+            Upload
+            <input type="file" id="input" style="display: none;">
+          </label>
+          <button class="btn btn-default">Download</button>
         </div>
       </div>
     </div>
@@ -48,6 +57,7 @@
   <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
   <script type="text/javascript" src="resources/states_data/us-states.js"></script>
   <script src="js/script.js"></script>
+
 </body>
 
 </html>

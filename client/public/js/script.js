@@ -5,7 +5,8 @@ const $countryName = $('.country-name');
 const map = L.map('map', {
   center: [37.8, -96],
   zoom: INITIAL_ZOOM,
-  maxZoom: MAX_ZOOM
+  maxZoom: MAX_ZOOM,
+  id: 'mapbox.satellite'
 });
 const colorScale = chroma
         .scale(['#D5E3FF', '#003171'])
@@ -98,9 +99,6 @@ function zoomToFeature(e) {
   const layer = e.target;
   const name = layer.feature.properties.name.replace(" ", "_");
   $.getJSON('resources/zipcode_json/zcta/' + name + ".topo.json").done(addTopoData);
-
-  // TODO: Remove the borders   from the states
-
   map.fitBounds(layer.getBounds());
 }
 
