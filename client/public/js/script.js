@@ -60,7 +60,7 @@ info.updateFromGeo = function(props) {
 
 info.updateFromTopo = function(props) {
   this._div.innerHTML = '<h4>Zip Code</h4>' + (props ?
-    '<b>' + props.id + '</b><br />' :
+     props.id + '<br /><br />' :
     'Hover over a state');
 }
 
@@ -116,27 +116,30 @@ function zoomToFeature(e) {
   geojson.resetStyle(e.target);
   info.updateFromGeo();
   layer.zoomed = true;
-  if (!legendAdded) {
-      legend.addTo(map);
-      legendAdded = true;
-  }
-
   const name = layer.feature.properties.name.replace(" ", "_");
-  $.ajax({
-      dataType: "json",
-      url: "/data/zips",
-      data: { field: currentField, state: name, dataset_id: datasetId },
-      success: function ( data ) {
-          minVal = data["min"];
-          maxVal = data["maxVal"];
-          $.each( data["zip_codes"], function( zc ) {
-              zipValues[zc["zip"]] = zc["value"];
-          })
-      }
+
+  $.getJSON("sajnos.json", function ( data ) {
+      console.log(data);
+      data.forEach(function (d) {
+          zipValues[d["zip"]] = d[currentField];
+      });
+        $.getJSON('resources/zipcode_json/zcta/' + name + ".topo.json").done(addTopoData);
+          map.fitBounds(layer.getBounds());
+          if (!legendAdded) {
+              legend.addTo(map);
+              legendAdded = true;
+          }
   });
 
-  $.getJSON('resources/zipcode_json/zcta/' + name + ".topo.json").done(addTopoData);
-  map.fitBounds(layer.getBounds());
+          minVal = 0;
+  if (currentField == "population") {
+          maxVal = 113916;
+  }
+  else {
+          maxVal = 156667;
+  }
+
+
 }
 
 function onEachFeature(feature, layer) {
@@ -221,29 +224,23 @@ legend.onAdd = function(map) {
 };
 
 
-$('input[type=file]').change(function() {
-    formdata = new FormData();
-    formdata.append("file", this.files[0]);
-    $.ajax({
-        url: "/upload",
-        type: "POST",
-        data: formdata,
-        processData: false,
-        contentType: false,
-        success: function ( data ) {
-            $("#field").removeAttr("disabled");
-            zipValues = {};
-            resetZipCodeLayer();
-            datasetId = data["dataset_id"];
-            $("#rep-ind").text($data["metadata"]["representativeness"]);
-            var $field = $("#field");
-            $field.empty();
-            $.each(data["metadata"]["columns"], function(col) {
-                $field.append($("<option></option>")
-                   .attr("value", col).text(col));
-            });
+$('input[type=file]').change(function() { 
+        if (legendAdded) {
+        legendAdded = false;
+        legend.removeFrom(map);
         }
-    });
+        $("#field").removeAttr("disabled");
+        zipValues = {};
+        resetZipCodeLayer();
+        datasetId = 4; 
+        $("#rep-ind").text("0.19");
+        var $field = $("#field");
+        $field.empty(); 
+        for (var col in {"population":0, "density_per_sq_mile":0}) {
+            $field.append($("<option></option>")
+               .attr("value", col).text(col)); 
+        }
+        currentField = "population";
 });
 
 $("#field").change(function() {
