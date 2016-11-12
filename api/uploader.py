@@ -2,6 +2,9 @@ import csv
 from mapper import Mapper
 import psycopg2
 
+def lst2pgarr(alist):
+    return '{' + ','.join(alist) + '}'
+
 def merge_two_dicts(x, y):
     '''Given two dicts, merge them into a new dict as a shallow copy.'''
     z = x.copy()
@@ -35,6 +38,8 @@ class Uploader:
         cols.remove('ip_address')
         cols = sorted(list(cols))
 
+        cur.execute("UPDATE datasets SET columns = '%s';" % (lst2pgarr(['ip_address'] + cols)))
+
         cur.execute("CREATE TABLE dataset_{} ({});".format(
             dataset_id,
             ", ".join(['ip_address inet'] + (map(lambda c: c + " double precision", cols)))
@@ -53,13 +58,16 @@ class Uploader:
 
         cur.execute("""
         CREATE VIEW dataset_view_{} AS (
-            SELECT d.*, ip_to_zip.zip, u.unemp_rate, u.num_in_sample, p.population, p.land_sq_mi, p.density_per_sq_mile
-            FROM dataset_{} d
-            JOIN ip_to_zip ON (ip_to_zip.ip >> d.ip_address::inet)
-            JOIN unemployment u ON u.zip = ip_to_zip.zip
-            JOIN popdense p ON u.zip = p.zip
+            -- SELECT d.*, ip_to_zip.zip, u.unemp_rate, u.num_in_sample, p.population, p.land_sq_mi, p.density_per_sq_mile
+            SELECT d.*, ip_to_zip.zip
+            FROM dataset_{} d, ip_to_zip
+            WHERE (
+              ip_to_zip.ip >> d.ip_address::inet
+            )
+            -- LEFT JOIN unemployment u ON u.zip = ip_to_zip.zip
+            -- LEFT JOIN popdense p ON u.zip = p.zip
         );
-        CREATE INDEX ON dataset_{} ((ip_address::inet));
+        CREATE INDEX ON dataset_{} USING gist ((ip_address::inet) inet_ops);
         """.format(dataset_id, dataset_id, dataset_id))
         self._conn.commit()
 
