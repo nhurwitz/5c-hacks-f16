@@ -3,9 +3,10 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Map Deduce</title>
+  <title>MapDeduce</title>
   <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+  <link href="https://fonts.googleapis.com/css?family=Slabo+27px" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css" />
   <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -18,8 +19,17 @@
     </section>
     <div id="sidebar-wrapper">
       <div class="title">
-        <h1>Map Deduce</h1>
+        <h1>MapDeduce</h1>
       </div>
+      <div class="desc">
+        <i>A census project by Dima Smirnov, Ted Kornish, Ziv Epstein, Antony Bello, and Noam Hurwitz.</i>
+      </div>
+
+      <div class="moreDesc">
+        Now, more than ever, we need to understand each other. Social science research relies on college students and <a href="https://en.wikipedia.org/wiki/Amazon_Mechanical_Turk">Amazon Mechanical Turk</a> workers for experiments, which compromises the representation of surveyed populations. MapDeduce provides an accessible way
+        for researchers to analyze the scope of their data.
+      </div>
+
       <div class="sidebar-nav">
         <div class="row">
             <div class="form-group">
@@ -31,8 +41,8 @@
         </div>
         <div class="row">
           <span class="label">Representativeness Index:</span>
-          <div class="index" id="rep-ind"> 0.74 </div>
-          <a href="#" data-toggle="popover" id="pop" data-placement="left" title="Representativeness Index" data-content="Measures how representative your sample distribution is of the US population distribution. Calculated using the Kullback–Leibler divergence. ">What is this?</a>
+          <div class="index"> 0.74 </div>
+          <a href="#" data-toggle="popover" id="pop" data-placement="left" title="Representativeness Index" data-content="Measures how representative your sample distribution is of the US population distribution. Calculated using the <a href='https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence'>Kullback–Leibler Divergence</a>. ">What is this?</a>
         </div>
         <div class="row uploader">
           <label class="btn btn-default btn-file upload">
@@ -52,7 +62,7 @@
   <script src="js/script.js"></script>
   <script>
     $(function() {
-      $('[data-toggle="popover"]').popover()
+      $('[data-toggle="popover"]').popover({html:true});
     })
   </script>
 </body>

@@ -1,6 +1,7 @@
 body, h1, h2, h3 {
-  font-family: 'Helvetica Neue';
-  font-weight: 200;
+  font-family: 'Slabo 27px';
+  font-weight: 300;
+  background-image: url('../resources/subtle_white_feathers.png');
 }
 
 .map-main {
@@ -16,7 +17,7 @@ body, h1, h2, h3 {
 }
 
 #pop {
-  padding-top: 20px;
+  padding-top: 10px;
   float: right;
 }
 
@@ -63,6 +64,19 @@ body, h1, h2, h3 {
 .title {
   margin: 0 auto;
   text-align: center;
+}
+
+.desc {
+  padding: 5px;
+  text-align: center;
+  font-size: 15px;
+}
+
+.moreDesc{
+  font-size: 15px;
+  padding-top: 20px;
+  padding-left: 20px;
+  text-align: left;
 }
 
 .label {
