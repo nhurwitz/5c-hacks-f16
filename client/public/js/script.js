@@ -1,9 +1,11 @@
 const MIN_ZOOM = 4;
 const INITIAL_ZOOM = 4;
+const MAX_ZOOM = 8;
 const $countryName = $('.country-name');
 const map = L.map('map', {
   center: [37.8, -96],
-  zoom: INITIAL_ZOOM
+  zoom: INITIAL_ZOOM,
+  maxZoom: MAX_ZOOM
 });
 const colorScale = chroma
         .scale(['#D5E3FF', '#003171'])
@@ -12,7 +14,8 @@ const info = L.control();
 
 L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYW50b255YmVsbG8iLCJhIjoiY2l2ZXUzanN6MDEwZDJubG13MTlmZjF4MyJ9.7h5pZPUAsDKiz5Um8IF15A', {
   id: 'mapbox.light',
-  minZoom: MIN_ZOOM
+  minZoom: MIN_ZOOM,
+  maxZoom: MAX_ZOOM
 }).addTo(map);
 
 L.TopoJSON = L.GeoJSON.extend({
@@ -37,15 +40,21 @@ geojson = L.geoJson(statesData, {
 
 info.onAdd = function(map) {
   this._div = L.DomUtil.create('div', 'info');
-  this.update();
+  this.updateFromGeo();
   return this._div;
 };
 
-info.update = function(props) {
+info.updateFromGeo = function(props) {
   this._div.innerHTML = '<h4>US Population Density</h4>' + (props ?
     '<b>' + props.name + '</b><br />' + props.density + ' people / mi<sup>2</sup>' :
     'Hover over a state');
 };
+
+info.updateFromTopo = function(props) {
+  this._div.innerHTML = '<h4>Zip Code</h4>' + (props ?
+    '<b>' + props.id + '</b><br />' :
+    'Hover over a state');
+}
 
 info.addTo(map);
 
@@ -80,18 +89,21 @@ function highlightGeoFeature(e) {
     dashArray: '',
     fillOpacity: 0.7
   });
-  info.update(layer.feature.properties);
+  info.updateFromGeo(layer.feature.properties);
 }
 
 function resetGeoFeature(e) {
   geojson.resetStyle(e.target);
-  info.update();
+  info.updateFromGeo();
 }
 
 function zoomToFeature(e) {
   const layer = e.target;
   const name = layer.feature.properties.name.replace(" ", "_");
   $.getJSON('resources/zipcode_json/zcta/' + name + ".topo.json").done(addTopoData);
+
+  // TODO: Remove the borders   from the states
+
   map.fitBounds(layer.getBounds());
 }
 
@@ -128,13 +140,12 @@ function handleTopoLayer(layer) {
 }
 
 function enterTopoLayer() {
-  countryName = this.feature.properties.name;
-  $countryName.text(countryName).show();
   this.setStyle({
     weight: 2,
     opacity: 1,
     color: 'white'
   });
+  info.updateFromTopo(this.feature);
 }
 
 function leaveTopoLayer() {
