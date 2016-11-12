@@ -13,6 +13,8 @@ const colorScale = chroma
         .domain([0,1]);
 const info = L.control();
 
+clickedStates = {}
+
 L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYW50b255YmVsbG8iLCJhIjoiY2l2ZXUzanN6MDEwZDJubG13MTlmZjF4MyJ9.7h5pZPUAsDKiz5Um8IF15A', {
   id: 'mapbox.streets',
   minZoom: MIN_ZOOM,
@@ -101,6 +103,8 @@ function resetGeoFeature(e) {
 
 function zoomToFeature(e) {
   const layer = e.target;
+  geojson.resetStyle(e.target);
+  info.updateFromGeo();
   layer.zoomed = true;
 
   const name = layer.feature.properties.name.replace(" ", "_");
@@ -118,10 +122,13 @@ function onEachFeature(feature, layer) {
 
 /** TOPO DATA **/
 function addTopoData(topoData) {
-  const topoLayer = new L.TopoJSON();
-  topoLayer.addData(topoData);
-  topoLayer.addTo(map);
-  topoLayer.eachLayer(handleTopoLayer);
+    var stateName = Object.keys(topoData.objects)[0]
+    if (!clickedStates[stateName]) {
+      clickedStates[stateName] = new L.TopoJSON(); 
+      clickedStates[stateName].addData(topoData);
+      clickedStates[stateName].addTo(map);
+      clickedStates[stateName].eachLayer(handleTopoLayer);
+    }
 }
 
 function handleTopoLayer(layer) {
@@ -154,6 +161,16 @@ function leaveTopoLayer() {
     opacity: 1,
     color: 'white'
   })
+}
+
+// Reset zipcode layer and resets zoom
+function resetZipCodeLayer() {
+  for (var state in clickedStates) {
+    var layer = clickedStates[state]
+    map.removeLayer(layer)
+    delete(clickedStates[state])
+  }
+  map.setView(map.options.center, map.options.zoom);
 }
 
 /** LEGEND **/
