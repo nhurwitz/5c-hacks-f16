@@ -19,10 +19,17 @@ class Mapper:
     def zip_to_census_data(self, zip):
         cur = self._conn.cursor()
         cur.execute("""
-        SELECT u.*, p.*
+        SELECT u.zip, u.unemp_rate, u.num_in_sample, p.population, p.land_sq_mi, p.density_per_sq_mile
         FROM unemployment u
         JOIN popdense p ON u.zip = p.zip
         WHERE u.zip = '{}'
         """.format(zip))
-        results = cur.fetchall() 
-        return results[0]
+        results = cur.fetchall()[0]
+        return {
+            'zip': results[0],
+            'unemployment_rate': results[1],
+            'num_in_sample': results[2],
+            'population': results[3],
+            'land_sq_mi': results[4],
+            'density_per_sq_mile': results[5]
+        }
