@@ -21,7 +21,6 @@ CREATE TABLE ip_to_zip (
     longitude real,
     accuracy_radius int
 );
-COPY ip_to_zip FROM '$PWD/IP2Zip.csv' DELIMITER ',' CSV HEADER;
 
 CREATE TABLE dave_data (
     ip inet,
@@ -49,14 +48,12 @@ CREATE TABLE dave_data (
     god real,
     log10_number_of_studies_completed real
 );
-COPY dave_data FROM '$PWD/hardcoded_dave_data.csv' DELIMITER ',' CSV HEADER;
 
 CREATE TABLE unemployment (
     zip text,
     unemp_rate text,
     num_in_sample real
 );
-COPY unemployment FROM '$PWD/zip2unemployment.csv' DELIMITER ',' CSV HEADER;
 
 CREATE TABLE popdense (
     zip text,
@@ -64,9 +61,20 @@ CREATE TABLE popdense (
     land_sq_mi real,
     density_per_sq_mile real
 );
-COPY popdense FROM '$PWD/zip2popdensity_area.csv' DELIMITER ',' CSV HEADER;
 
+CREATE TABLE datasets (
+  id bigserial,
+  columns text[] -- not including IP address
+);
+
+COPY ip_to_zip FROM '$PWD/IP2Zip.csv' DELIMITER ',' CSV HEADER;
+COPY dave_data FROM '$PWD/hardcoded_dave_data.csv' DELIMITER ',' CSV HEADER;
+COPY unemployment FROM '$PWD/zip2unemployment.csv' DELIMITER ',' CSV HEADER;
+COPY popdense FROM '$PWD/zip2popdensity_area.csv' DELIMITER ',' CSV HEADER;
 CREATE INDEX ON ip_to_zip USING gist (ip inet_ops);
+CREATE INDEX ON ip_to_zip (zip);
+CREATE INDEX ON popdense (zip);
+CREATE INDEX ON unemployment (zip);
 	" | psql ip
 
 rm IP2Zip.csv
