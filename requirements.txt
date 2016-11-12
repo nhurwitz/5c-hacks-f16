@@ -1,2 +1,2 @@
-1. O(chill) time
-2. IDGAF space
+numpy==1.11.2
+scipy==0.18.1
