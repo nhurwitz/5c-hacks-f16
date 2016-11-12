@@ -1,1 +1,0 @@
-gunzip -ck GeoLite2-City-Blocks-IPv4.csv.gz > ../IP2Zip.csv
