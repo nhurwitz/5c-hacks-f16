@@ -65,6 +65,8 @@ CREATE TABLE popdense (
     density_per_sq_mile real
 );
 COPY popdense FROM '$PWD/zip2popdensity_area.csv' DELIMITER ',' CSV HEADER;
+
+CREATE INDEX ON ip_to_zip USING gist (ip inet_ops);
 	" | psql ip
 
 rm IP2Zip.csv

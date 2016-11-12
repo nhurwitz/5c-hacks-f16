@@ -24,7 +24,5 @@ class Mapper:
         JOIN popdense p ON u.zip = p.zip
         WHERE u.zip = '{}'
         """.format(zip))
-        results = cur.fetchall()
+        results = cur.fetchall() 
         return results[0]
-
-m = Mapper()
