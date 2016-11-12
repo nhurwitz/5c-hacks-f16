@@ -34,6 +34,8 @@
         </div>
         <div class="row">
           <span class="label">Representativeness Index:</span>
+          <div class="index"> 0.74 </div>
+          <a href="#" data-toggle="popover" id="pop" data-placement="left" title="Representativeness Index" data-content="Measures how representative your sample distribution is of the US population distribution. Calculated using the Kullback–Leibler divergence. ">What is this?</a>
         </div>
         <div class="row uploader">
           <label class="btn btn-default btn-file upload">
@@ -47,11 +49,15 @@
   </div>
 
   <script src="//cdnjs.cloudflare.com/ajax/libs/chroma-js/0.5.9/chroma.min.js"></script>
-  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
   <script src="http://d3js.org/topojson.v1.min.js"></script>
   <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
   <script type="text/javascript" src="resources/states_data/us-states.js"></script>
   <script src="js/script.js"></script>
+  <script>
+    $(function() {
+      $('[data-toggle="popover"]').popover()
+    })
+  </script>
 </body>
 
 </html>
