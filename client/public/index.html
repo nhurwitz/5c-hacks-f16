@@ -73,7 +73,7 @@
         .domain([0,1]);
 
     map.setView([44,-31], 3);
-    $.getJSON('data/countries.topo.json').done(addTopoData);
+    $.getJSON('resources/zipcode_json/zcta/California.topo.json').done(addTopoData);
     function addTopoData(topoData){
       topoLayer.addData(topoData);
       topoLayer.addTo(map);
