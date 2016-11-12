@@ -8,10 +8,16 @@ const map = L.map('map', {
   maxZoom: MAX_ZOOM,
   id: 'mapbox.satellite'
 });
-const colorScale = chroma
-        .scale(['#D5E3FF', '#003171'])
-        .domain([0,1]);
 const info = L.control();
+var topoLayer;
+
+var zipValues = {};
+var minVal = 0;
+var maxVal = 100;
+var datasetId;
+var representativeness;
+var currentField;
+var legendAdded = false;
 
 clickedStates = {}
 
@@ -63,14 +69,18 @@ info.addTo(map);
 /** INFO **/
 
 function getColor(d) {
-  return d > 1000 ? '#800026' :
-    d > 500 ? '#BD0026' :
-    d > 200 ? '#E31A1C' :
-    d > 100 ? '#FC4E2A' :
-    d > 50 ? '#FD8D3C' :
-    d > 20 ? '#FEB24C' :
-    d > 10 ? '#FED976' :
+  return d > 1 ? '#800026' :
+    d > 6/7 ? '#BD0026' :
+    d > 5/7 ? '#E31A1C' :
+    d > 4/7 ? '#FC4E2A' :
+    d > 3/7 ? '#FD8D3C' :
+    d > 2/7 ? '#FEB24C' :
+    d > 1/7 ? '#FED976' :
     '#FFEDA0';
+}
+
+function normalize(val) {
+    return (val - minVal) / (maxVal - minVal);
 }
 
 function style(feature) {
@@ -104,8 +114,25 @@ function resetGeoFeature(e) {
 function zoomToFeature(e) {
   const layer = e.target;
   layer.zoomed = true;
+  if (!legendAdded) {
+      legend.addTo(map);
+      legendAdded = true;
+  }
 
   const name = layer.feature.properties.name.replace(" ", "_");
+  $.ajax({
+      dataType: "json",
+      url: "/data/zips",
+      data: { field: currentField, state: name, dataset_id: datasetId },
+      success: function ( data ) {
+          minVal = data["min"];
+          maxVal = data["maxVal"];
+          $.each( data["zip_codes"], function( zc ) {
+              zipValues[zc["zip"]] = zc["value"];
+          })
+      }
+  });
+
   $.getJSON('resources/zipcode_json/zcta/' + name + ".topo.json").done(addTopoData);
   map.fitBounds(layer.getBounds());
 }
@@ -128,8 +155,7 @@ function addTopoData(topoData) {
 }
 
 function handleTopoLayer(layer) {
-  var randomValue = Math.random(),
-    fillColor = colorScale(randomValue).hex();
+  var fillColor = getColor(normalize(zipValues[layer.feature.id]));
   layer.setStyle({
     fillColor: fillColor,
     fillOpacity: 1,
@@ -177,21 +203,46 @@ var legend = L.control({
 legend.onAdd = function(map) {
 
   var div = L.DomUtil.create('div', 'info legend'),
-    grades = [0, 10, 20, 50, 100, 200, 500, 1000],
     labels = [],
     from, to;
-
-  for (var i = 0; i < grades.length; i++) {
-    from = grades[i];
-    to = grades[i + 1];
+  
+  delta = (maxVal - minVal) / 7;
+  for (var i = 0; i < 7; i++) {
 
     labels.push(
-      '<i style="background:' + getColor(from + 1) + '"></i> ' +
-      from + (to ? '&ndash;' + to : '+'));
+      '<i style="background:' + getColor(i/7) + '"></i> ' +
+     (minVal + i * delta).toFixed(1) + "-" + (minVal + (i+1) * delta).toFixed(1));
   }
 
   div.innerHTML = labels.join('<br>');
   return div;
 };
 
-legend.addTo(map);
+
+$('input[type=file]').change(function() { 
+    formdata = new FormData();
+    formdata.append("file", this.files[0]);
+    $.ajax({
+        url: "/upload",
+        type: "POST",
+        data: formdata,
+        processData: false,
+        contentType: false,
+        success: function ( data ) {
+            zipValues = {};
+            datasetId = data["dataset_id"];
+            representativeness = data["metadata"]["representativeness"];
+            var $field = $("#field");
+            $field.empty(); 
+            $.each(data["metadata"]["columns"], function(col) {
+                $field.append($("<option></option>")
+                   .attr("value", col).text(col)); 
+            });
+        }
+    });
+});
+
+$("#field").change(function() {
+    currentField = $('#field').val();
+    resetZipCodeLayer();
+});
