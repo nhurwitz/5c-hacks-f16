@@ -113,6 +113,8 @@ function resetGeoFeature(e) {
 
 function zoomToFeature(e) {
   const layer = e.target;
+  geojson.resetStyle(e.target);
+  info.updateFromGeo();
   layer.zoomed = true;
   if (!legendAdded) {
       legend.addTo(map);
@@ -148,10 +150,12 @@ function onEachFeature(feature, layer) {
 /** TOPO DATA **/
 function addTopoData(topoData) {
     var stateName = Object.keys(topoData.objects)[0]
-    clickedStates[stateName] = new L.TopoJSON(); 
-    clickedStates[stateName].addData(topoData);
-    clickedStates[stateName].addTo(map);
-    clickedStates[stateName].eachLayer(handleTopoLayer);
+    if (!clickedStates[stateName]) {
+      clickedStates[stateName] = new L.TopoJSON(); 
+      clickedStates[stateName].addData(topoData);
+      clickedStates[stateName].addTo(map);
+      clickedStates[stateName].eachLayer(handleTopoLayer);
+    }
 }
 
 function handleTopoLayer(layer) {
