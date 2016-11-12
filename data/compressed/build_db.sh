@@ -6,8 +6,9 @@ gunzip -ck zip2popdensity-area.csv.gz > zip2popdensity_area.csv
 echo "
 DROP DATABASE ip;
 CREATE DATABASE ip;
-\c ip
+" | psql postgres
 
+echo "
 CREATE TABLE ip_to_zip (
     ip inet,
     geoname_id int,
@@ -64,7 +65,7 @@ CREATE TABLE popdense (
     density_per_sq_mile real
 );
 COPY popdense FROM '$PWD/zip2popdensity_area.csv' DELIMITER ',' CSV HEADER;
-	" | psql
+	" | psql ip
 
 rm IP2Zip.csv
 rm hardcoded_dave_data.csv
