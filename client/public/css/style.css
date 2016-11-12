@@ -1,15 +1,40 @@
 .map-main {
   position: absolute;
+  display: inline;
+  float: left;
   top: 0;
   bottom: 0;
   right: 0;
   left: 0;
+  height: 100%;
+  width: 70%;
 }
+
+#sidebar-wrapper {
+  z-index: 1000;
+  position: fixed;
+  right: 0px;
+  width: 30%;
+  height: 100%;
+  margin-left: -250px;
+  overflow-y: auto;
+}
+
+.sidebar-nav {
+  position: absolute;
+  top: 0;
+  width: 250px;
+  margin: 0;
+  padding: 10px;
+  list-style: none;
+}
+
 #map {
-  position: relative;
   height: 100%;
   width: 100%;
+  border-right: 2px solid #eeeeee;
 }
+
 .leaflet-container {
   background: #4a5870;
 }

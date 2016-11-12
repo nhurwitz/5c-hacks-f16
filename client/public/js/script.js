@@ -1,111 +1,174 @@
-	var map = L.map('map').setView([37.8, -96], 4);
+const MIN_ZOOM = 4;
+const INITIAL_ZOOM = 4;
+const $countryName = $('.country-name');
+const map = L.map('map', {
+  center: [37.8, -96],
+  zoom: INITIAL_ZOOM
+});
+const colorScale = chroma
+        .scale(['#D5E3FF', '#003171'])
+        .domain([0,1]);
+const info = L.control();
 
-	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYW50b255YmVsbG8iLCJhIjoiY2l2ZXUzanN6MDEwZDJubG13MTlmZjF4MyJ9.7h5pZPUAsDKiz5Um8IF15A', {
-		id: 'mapbox.light'
-	}).addTo(map);
+L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYW50b255YmVsbG8iLCJhIjoiY2l2ZXUzanN6MDEwZDJubG13MTlmZjF4MyJ9.7h5pZPUAsDKiz5Um8IF15A', {
+  id: 'mapbox.light',
+  minZoom: MIN_ZOOM
+}).addTo(map);
 
-	// control that shows state info on hover
-	var info = L.control();
+L.TopoJSON = L.GeoJSON.extend({
+  addData: function(jsonData) {
+    if (jsonData.type === "Topology") {
+      for (key in jsonData.objects) {
+        const geojson = topojson.feature(jsonData, jsonData.objects[key]);
+        L.GeoJSON.prototype.addData.call(this, geojson);
+      }
+    } else {
+      L.GeoJSON.prototype.addData.call(this, jsonData);
+    }
+  }
+});
 
-	info.onAdd = function (map) {
-		this._div = L.DomUtil.create('div', 'info');
-		this.update();
-		return this._div;
-	};
+geojson = L.geoJson(statesData, {
+  style: style,
+  onEachFeature: onEachFeature
+}).addTo(map);
 
-	info.update = function (props) {
-		this._div.innerHTML = '<h4>US Population Density</h4>' +  (props ?
-			'<b>' + props.name + '</b><br />' + props.density + ' people / mi<sup>2</sup>'
-			: 'Hover over a state');
-	};
+/** INFO **/
 
-	info.addTo(map);
+info.onAdd = function(map) {
+  this._div = L.DomUtil.create('div', 'info');
+  this.update();
+  return this._div;
+};
 
-	// get color depending on population density value
-	function getColor(d) {
-		return d > 1000 ? '#800026' :
-				d > 500  ? '#BD0026' :
-				d > 200  ? '#E31A1C' :
-				d > 100  ? '#FC4E2A' :
-				d > 50   ? '#FD8D3C' :
-				d > 20   ? '#FEB24C' :
-				d > 10   ? '#FED976' :
-							'#FFEDA0';
-	}
+info.update = function(props) {
+  this._div.innerHTML = '<h4>US Population Density</h4>' + (props ?
+    '<b>' + props.name + '</b><br />' + props.density + ' people / mi<sup>2</sup>' :
+    'Hover over a state');
+};
 
-	function style(feature) {
-		return {
-			weight: 2,
-			opacity: 1,
-			color: 'white',
-			fillOpacity: 0.7,
-			fillColor: getColor(feature.properties.density)
-		};
-	}
+info.addTo(map);
 
-	function highlightFeature(e) {
-		var layer = e.target;
+/** INFO **/
 
-		layer.setStyle({
-			weight: 5,
-			color: '#666',
-			dashArray: '',
-			fillOpacity: 0.7
-		});
+function getColor(d) {
+  return d > 1000 ? '#800026' :
+    d > 500 ? '#BD0026' :
+    d > 200 ? '#E31A1C' :
+    d > 100 ? '#FC4E2A' :
+    d > 50 ? '#FD8D3C' :
+    d > 20 ? '#FEB24C' :
+    d > 10 ? '#FED976' :
+    '#FFEDA0';
+}
 
-		if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-			layer.bringToFront();
-		}
+function style(feature) {
+  return {
+    weight: 2,
+    opacity: 1,
+    color: 'white',
+    fillOpacity: 0.7,
+    fillColor: getColor(feature.properties.density)
+  };
+}
 
-		info.update(layer.feature.properties);
-	}
+function highlightGeoFeature(e) {
+  const layer = e.target;
+  layer.setStyle({
+    weight: 5,
+    color: '#eeeeee',
+    dashArray: '',
+    fillOpacity: 0.7
+  });
+  info.update(layer.feature.properties);
+}
 
-	var geojson;
+function resetGeoFeature(e) {
+  geojson.resetStyle(e.target);
+  info.update();
+}
 
-	function resetHighlight(e) {
-		geojson.resetStyle(e.target);
-		info.update();
-	}
+function zoomToFeature(e) {
+  const layer = e.target;
+  const name = layer.feature.properties.name.replace(" ", "_");
+  $.getJSON('resources/zipcode_json/zcta/' + name + ".topo.json").done(addTopoData);
+  map.fitBounds(layer.getBounds());
+}
 
-	function zoomToFeature(e) {
-		map.fitBounds(e.target.getBounds());
-	}
+function onEachFeature(feature, layer) {
+  layer.on({
+    mouseover: highlightGeoFeature,
+    mouseout: resetGeoFeature,
+    click: zoomToFeature
+  });
+}
 
-	function onEachFeature(feature, layer) {
-		layer.on({
-			mouseover: highlightFeature,
-			mouseout: resetHighlight,
-			click: zoomToFeature
-		});
-	}
+/** TOPO DATA **/
+function addTopoData(topoData) {
+  const topoLayer = new L.TopoJSON();
+  topoLayer.addData(topoData);
+  topoLayer.addTo(map);
+  topoLayer.eachLayer(handleTopoLayer);
+}
 
-	geojson = L.geoJson(statesData, {
-		style: style,
-		onEachFeature: onEachFeature
-	}).addTo(map);
+function handleTopoLayer(layer) {
+  var randomValue = Math.random(),
+    fillColor = colorScale(randomValue).hex();
+  layer.setStyle({
+    fillColor: fillColor,
+    fillOpacity: 1,
+    color: '#555',
+    weight: 1,
+    opacity: .5
+  });
+  layer.on({
+    mouseover: enterTopoLayer,
+    mouseout: leaveTopoLayer
+  });
+}
 
-	map.attributionControl.addAttribution('Population data &copy; <a href="http://census.gov/">US Census Bureau</a>');
+function enterTopoLayer() {
+  countryName = this.feature.properties.name;
+  $countryName.text(countryName).show();
+  this.setStyle({
+    weight: 2,
+    opacity: 1,
+    color: 'white'
+  });
+}
 
-	var legend = L.control({position: 'bottomright'});
+function leaveTopoLayer() {
+  $countryName.hide();
+  this.setStyle({
+    weight: 0,
+    opacity: 1,
+    color: 'white'
+  })
+}
 
-	legend.onAdd = function (map) {
+/** LEGEND **/
+var legend = L.control({
+  position: 'bottomright'
+});
 
-		var div = L.DomUtil.create('div', 'info legend'),
-			grades = [0, 10, 20, 50, 100, 200, 500, 1000],
-			labels = [],
-			from, to;
+legend.onAdd = function(map) {
 
-		for (var i = 0; i < grades.length; i++) {
-			from = grades[i];
-			to = grades[i + 1];
+  var div = L.DomUtil.create('div', 'info legend'),
+    grades = [0, 10, 20, 50, 100, 200, 500, 1000],
+    labels = [],
+    from, to;
 
-			labels.push(
-				'<i style="background:' + getColor(from + 1) + '"></i> ' +
-				from + (to ? '&ndash;' + to : '+'));
-		}
+  for (var i = 0; i < grades.length; i++) {
+    from = grades[i];
+    to = grades[i + 1];
 
-		div.innerHTML = labels.join('<br>');
-		return div;
-	};
+    labels.push(
+      '<i style="background:' + getColor(from + 1) + '"></i> ' +
+      from + (to ? '&ndash;' + to : '+'));
+  }
 
-	legend.addTo(map);
+  div.innerHTML = labels.join('<br>');
+  return div;
+};
+
+legend.addTo(map);
