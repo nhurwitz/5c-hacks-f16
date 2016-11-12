@@ -151,7 +151,7 @@ function onEachFeature(feature, layer) {
 function addTopoData(topoData) {
     var stateName = Object.keys(topoData.objects)[0]
     if (!clickedStates[stateName]) {
-      clickedStates[stateName] = new L.TopoJSON(); 
+      clickedStates[stateName] = new L.TopoJSON();
       clickedStates[stateName].addData(topoData);
       clickedStates[stateName].addTo(map);
       clickedStates[stateName].eachLayer(handleTopoLayer);
@@ -181,11 +181,9 @@ function enterTopoLayer() {
 }
 
 function leaveTopoLayer() {
-  $countryName.hide();
   this.setStyle({
-    weight: 0,
-    opacity: 1,
-    color: 'white'
+    color: '#555',
+    weight: .7,
   })
 }
 
@@ -209,7 +207,7 @@ legend.onAdd = function(map) {
   var div = L.DomUtil.create('div', 'info legend'),
     labels = [],
     from, to;
-  
+
   delta = (maxVal - minVal) / 7;
   for (var i = 0; i < 7; i++) {
 
@@ -223,7 +221,7 @@ legend.onAdd = function(map) {
 };
 
 
-$('input[type=file]').change(function() { 
+$('input[type=file]').change(function() {
     formdata = new FormData();
     formdata.append("file", this.files[0]);
     $.ajax({
@@ -239,10 +237,10 @@ $('input[type=file]').change(function() {
             datasetId = data["dataset_id"];
             $("#rep-ind").text($data["metadata"]["representativeness"]);
             var $field = $("#field");
-            $field.empty(); 
+            $field.empty();
             $.each(data["metadata"]["columns"], function(col) {
                 $field.append($("<option></option>")
-                   .attr("value", col).text(col)); 
+                   .attr("value", col).text(col));
             });
         }
     });
