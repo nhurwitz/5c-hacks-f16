@@ -1,0 +1,43 @@
+Population density 
+Zip code voted in the presidential election
+Religiosity
+Income distribution
+Education distribution
+Teen pregnancy rates
+Suicide rates
+Drug overdoses
+Violent crime
+Non-violent crime
+Racial diversity
+Employment
+Gender
+Sexuality
+Marital status
+Household size (i.e. #ppl in house)
+Charitable giving (ideally religious & non-)
+Other health measures? E.g. Obesity?
+Alcohol use
+Closest theatre
+Closest museum
+Closest library
+Number of local businesses
+Number of churches within, say, 50 square miles
+Internet speed
+Distance to nearest university
+Major local industry
+Diversity or number of local industries
+Language other than English spoken at home
+Number of generation in one household
+Percentage of students on national school lunch program (subsidized lunch plan)
+Number of internet connections Per capita
+Percent of crime committed while intoxicated vs. committed while sober
+Number of women who own business
+Number of women who hold elected office
+Number of minorities who own business
+Number of minorities who hold elected office
+Discrimination cases filed
+Discrimination cases charged/ won
+Mental health funding
+Education funding
+Taxes paid/ owed
+Any other faith in institution indicators
