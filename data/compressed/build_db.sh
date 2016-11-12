@@ -2,6 +2,7 @@ gunzip -ck GeoLite2-City-Blocks-IPv4.csv.gz > IP2Zip.csv
 gunzip -ck hardcoded-dave-data.csv.gz > hardcoded_dave_data.csv
 gunzip -ck zip2unemployment.csv.gz > zip2unemployment.csv
 gunzip -ck zip2popdensity-area.csv.gz > zip2popdensity_area.csv
+
 echo "
 DROP DATABASE ip;
 CREATE DATABASE ip;
@@ -64,6 +65,7 @@ CREATE TABLE popdense (
 );
 COPY popdense FROM '$PWD/zip2popdensity_area.csv' DELIMITER ',' CSV HEADER;
 	" | psql
+
 rm IP2Zip.csv
 rm hardcoded_dave_data.csv
 rm zip2unemployment.csv
