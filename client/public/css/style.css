@@ -21,12 +21,26 @@
 }
 
 .sidebar-nav {
-  position: absolute;
   top: 0;
-  width: 250px;
   margin: 0;
   padding: 10px;
   list-style: none;
+}
+
+.title {
+  margin: 0 auto;
+  text-align: center;
+}
+
+.label {
+  vertical-align: middle;
+  display: inline;
+  color: black;
+  font-size: 15px;
+}
+
+.dropdown {
+  display:inline;
 }
 
 #map {
@@ -39,7 +53,8 @@
   background: #4a5870;
 }
 .info {
-  padding: 6px 8px;
+  text-align: center;
+  padding: 3px 5px;
   font: 14px/16px Arial, Helvetica, sans-serif;
   background: white;
   background: rgba(255, 255, 255, 0.8);
@@ -47,7 +62,6 @@
   border-radius: 5px;
 }
 .info h4 {
-  margin: 0 0 5px;
   color: #777;
 }
 .legend {

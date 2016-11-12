@@ -45,9 +45,8 @@ info.onAdd = function(map) {
 };
 
 info.updateFromGeo = function(props) {
-  this._div.innerHTML = '<h4>US Population Density</h4>' + (props ?
-    '<b>' + props.name + '</b><br />' + props.density + ' people / mi<sup>2</sup>' :
-    'Hover over a state');
+  this._div.innerHTML = '<h4>Click on a state to explore </h4>' + (props ?
+    '<b>' + props.name + '</b><br />' + props.density + ' people / mi<sup>2</sup>' : '');
 };
 
 info.updateFromTopo = function(props) {
@@ -76,8 +75,7 @@ function style(feature) {
     weight: 2,
     opacity: 1,
     color: 'white',
-    fillOpacity: 0.7,
-    fillColor: getColor(feature.properties.density)
+    fillOpacity: 0
   };
 }
 
@@ -89,7 +87,6 @@ function highlightGeoFeature(e) {
     dashArray: '',
     fillOpacity: 0.7
   });
-  info.updateFromGeo(layer.feature.properties);
 }
 
 function resetGeoFeature(e) {
