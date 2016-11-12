@@ -5,7 +5,8 @@ const $countryName = $('.country-name');
 const map = L.map('map', {
   center: [37.8, -96],
   zoom: INITIAL_ZOOM,
-  maxZoom: MAX_ZOOM
+  maxZoom: MAX_ZOOM,
+  id: 'mapbox.satellite'
 });
 const colorScale = chroma
         .scale(['#D5E3FF', '#003171'])
@@ -13,7 +14,7 @@ const colorScale = chroma
 const info = L.control();
 
 L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYW50b255YmVsbG8iLCJhIjoiY2l2ZXUzanN6MDEwZDJubG13MTlmZjF4MyJ9.7h5pZPUAsDKiz5Um8IF15A', {
-  id: 'mapbox.light',
+  id: 'mapbox.streets',
   minZoom: MIN_ZOOM,
   maxZoom: MAX_ZOOM
 }).addTo(map);
@@ -45,9 +46,8 @@ info.onAdd = function(map) {
 };
 
 info.updateFromGeo = function(props) {
-  this._div.innerHTML = '<h4>US Population Density</h4>' + (props ?
-    '<b>' + props.name + '</b><br />' + props.density + ' people / mi<sup>2</sup>' :
-    'Hover over a state');
+  this._div.innerHTML = '<h4>Click on a state to explore </h4>' + (props ?
+    '<b>' + props.name + '</b><br />' + props.density + ' people / mi<sup>2</sup>' : '');
 };
 
 info.updateFromTopo = function(props) {
@@ -73,11 +73,10 @@ function getColor(d) {
 
 function style(feature) {
   return {
-    weight: 2,
-    opacity: 1,
+    weight: 1,
+    opacity: .5,
     color: 'white',
-    fillOpacity: 0.7,
-    fillColor: getColor(feature.properties.density)
+    fillOpacity: 0
   };
 }
 
@@ -87,23 +86,25 @@ function highlightGeoFeature(e) {
     weight: 5,
     color: '#eeeeee',
     dashArray: '',
-    fillOpacity: 0.7
+    fillOpacity: 0.7,
+    fillColor: 'white'
   });
-  info.updateFromGeo(layer.feature.properties);
 }
 
 function resetGeoFeature(e) {
-  geojson.resetStyle(e.target);
-  info.updateFromGeo();
+  const layer = e.target;
+  if (!layer.zoomed) {
+    geojson.resetStyle(e.target);
+    info.updateFromGeo();
+  }
 }
 
 function zoomToFeature(e) {
   const layer = e.target;
+  layer.zoomed = true;
+
   const name = layer.feature.properties.name.replace(" ", "_");
   $.getJSON('resources/zipcode_json/zcta/' + name + ".topo.json").done(addTopoData);
-
-  // TODO: Remove the borders   from the states
-
   map.fitBounds(layer.getBounds());
 }
 
@@ -131,7 +132,6 @@ function handleTopoLayer(layer) {
     fillOpacity: 1,
     color: '#555',
     weight: 1,
-    opacity: .5
   });
   layer.on({
     mouseover: enterTopoLayer,
@@ -142,8 +142,7 @@ function handleTopoLayer(layer) {
 function enterTopoLayer() {
   this.setStyle({
     weight: 2,
-    opacity: 1,
-    color: 'white'
+    opacity: 1
   });
   info.updateFromTopo(this.feature);
 }
