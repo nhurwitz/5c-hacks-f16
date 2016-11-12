@@ -14,7 +14,7 @@ const colorScale = chroma
 const info = L.control();
 
 L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYW50b255YmVsbG8iLCJhIjoiY2l2ZXUzanN6MDEwZDJubG13MTlmZjF4MyJ9.7h5pZPUAsDKiz5Um8IF15A', {
-  id: 'mapbox.light',
+  id: 'mapbox.streets',
   minZoom: MIN_ZOOM,
   maxZoom: MAX_ZOOM
 }).addTo(map);
@@ -73,8 +73,8 @@ function getColor(d) {
 
 function style(feature) {
   return {
-    weight: 2,
-    opacity: 1,
+    weight: 1,
+    opacity: .5,
     color: 'white',
     fillOpacity: 0
   };
@@ -86,17 +86,23 @@ function highlightGeoFeature(e) {
     weight: 5,
     color: '#eeeeee',
     dashArray: '',
-    fillOpacity: 0.7
+    fillOpacity: 0.7,
+    fillColor: 'white'
   });
 }
 
 function resetGeoFeature(e) {
-  geojson.resetStyle(e.target);
-  info.updateFromGeo();
+  const layer = e.target;
+  if (!layer.zoomed) {
+    geojson.resetStyle(e.target);
+    info.updateFromGeo();
+  }
 }
 
 function zoomToFeature(e) {
   const layer = e.target;
+  layer.zoomed = true;
+
   const name = layer.feature.properties.name.replace(" ", "_");
   $.getJSON('resources/zipcode_json/zcta/' + name + ".topo.json").done(addTopoData);
   map.fitBounds(layer.getBounds());
@@ -126,7 +132,6 @@ function handleTopoLayer(layer) {
     fillOpacity: 1,
     color: '#555',
     weight: 1,
-    opacity: .5
   });
   layer.on({
     mouseover: enterTopoLayer,
@@ -137,8 +142,7 @@ function handleTopoLayer(layer) {
 function enterTopoLayer() {
   this.setStyle({
     weight: 2,
-    opacity: 1,
-    color: 'white'
+    opacity: 1
   });
   info.updateFromTopo(this.feature);
 }
