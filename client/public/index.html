@@ -65,6 +65,8 @@
     (function(){
     'use strict'
 
+    var states = "Alabama.topo.json,Alaska.topo.json,Arizona.topo.json,Arkansas.topo.json,California.topo.json,Colorado.topo.json,Connecticut.topo.json,Delaware.topo.json,District_of_Columbia.topo.json,Florida.topo.json,Georgia.topo.json,Hawaii.topo.json,Idaho.topo.json,Illinois.topo.json,Indiana.topo.json,Iowa.topo.json,Kansas.topo.json,Kentucky.topo.json,Louisiana.topo.json,Maine.topo.json,Maryland.topo.json,Massachusetts.topo.json,Michigan.topo.json,Minnesota.topo.json,Mississippi.topo.json,Missouri.topo.json,Montana.topo.json,Nebraska.topo.json,Nevada.topo.json,New_Hampshire.topo.json,New_Jersey.topo.json,New_Mexico.topo.json,New_York.topo.json,North_Carolina.topo.json,North_Dakota.topo.json,Ohio.topo.json,Oklahoma.topo.json,Oregon.topo.json,Pennsylvania.topo.json,Puerto_Rico.topo.json,Rhode_Island.topo.json,South_Carolina.topo.json,South_Dakota.topo.json,Tennessee.topo.json,Texas.topo.json,Utah.topo.json,Vermont.topo.json,Virginia.topo.json,Washington.topo.json,West_Virginia.topo.json,Wisconsin.topo.json,Wyoming.topo.json";
+
     var map = L.map('worldmap',{maxZoom:10,minZoom:3}),
       topoLayer = new L.TopoJSON(),
       $countryName = $('.country-name'),
@@ -73,7 +75,10 @@
         .domain([0,1]);
 
     map.setView([44,-31], 3);
-    $.getJSON('resources/zipcode_json/zcta/California.topo.json').done(addTopoData);
+    var statesList = states.split(",")
+    for (var i = 0; i < statesList.length; i++) {
+      $.getJSON('resources/zipcode_json/zcta/' + statesList[i]).done(addTopoData);
+    }
     function addTopoData(topoData){
       topoLayer.addData(topoData);
       topoLayer.addTo(map);
